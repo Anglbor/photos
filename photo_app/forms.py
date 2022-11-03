@@ -19,3 +19,7 @@ class DisplayForm(forms.ModelForm):
         model = Photo
         fields = ('name', 'photo')
 
+
+class SearchForm(forms.Form):
+    search = forms.CharField(label='search')
+

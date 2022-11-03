@@ -1,0 +1,18 @@
+{% extends 'base2.html' %}
+
+{% block content %}
+    <form action="" method="post">
+        {% csrf_token %}
+        {{ form }}
+        <button type="submit">Search</button>
+    </form>
+
+
+     <h2>Photos:</h2>
+    <ul>
+        {% for photo in photos %}
+            <li><a href="/photo/{{photo.id}}"><img src="{{ photo.photo.url }}" width="500px"/></a></li>
+<!--            <a href="/photo/{{pic.id}}"><img src="{{ pic.photo.url }}" width="500px"/></a>-->
+        {% endfor %}
+    </ul>
+{% endblock %}

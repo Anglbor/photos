@@ -39,6 +39,9 @@ class Photo(models.Model):
     # take_date = DateTimeField(null=True)
     tag = models.ManyToManyField(Tag)
 
+    def __str__(self):
+        return self.name
+
 
 
 
@@ -48,14 +51,18 @@ class Album(models.Model):
     album_name = models.CharField(max_length=256)
     # album = models.ManyToManyField(Photo)
 
-class Location(models.Model):
-    location_name = models.CharField(max_length=256, choices=LOCATIONS)
-    location = models.ForeignKey(Photo, on_delete=models.CASCADE)
+# class Location(models.Model):
+#     location_name = models.CharField(max_length=256, choices=LOCATIONS)
+#     location = models.ForeignKey(Photo, on_delete=models.CASCADE)
 
 
-class Camera(models.Model):
-    photo = models.OneToOneField(Photo, on_delete=models.CASCADE, primary_key=True)
-    camera_name = models.CharField(max_length=256)
+# class Camera(models.Model):
+#     photo = models.OneToOneField(Photo, on_delete=models.CASCADE, primary_key=True)
+#     camera_name = models.CharField(max_length=256)
+
+class Display_photos(models.Model):
+    display_photo = models.ImageField(upload_to='display_photos')
+
 
 
 

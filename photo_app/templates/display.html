@@ -1,14 +1,20 @@
 {% extends 'base2.html' %}
+{% load static %}
+
 
 {% block content %}
-        <h2>Display:</h2>
+
+
+<h2>Display:</h2>
     <ul>
-       {% for pic in photo_list %}
-    <img src="{{ pic.photo.url }}" width="500px"/>
 
 
+        {% for pic in photo_list %}
+
+        <a href="/photo/{{pic.id}}"><img src="{{ pic.photo.url }}" width="500px"  onmouseover="imageBorder(this)" onmouseout="imageNormal(this)"/></a>
         {% endfor %}
-
-
     </ul>
+
+<script src="{% static 'static/js/image.js' %}"></script>
 {% endblock %}
+

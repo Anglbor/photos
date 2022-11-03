@@ -1,0 +1,19 @@
+{% extends 'base2.html' %}
+
+{% block content %}
+        <h2>Photo:</h2>
+    <ul>
+       {{ photo }}
+
+        <img src="{{ photo.photo.url }}" width="500px"/>
+
+
+        {% for tag in photo.tag.all %}
+        <li>{{tag.tag_name}}</li>
+
+        {% endfor %}
+
+
+
+    </ul>
+{% endblock %}
