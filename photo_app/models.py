@@ -24,6 +24,7 @@ LOCATIONS = (
 
 class Tag(models.Model):
     tag_name = models.CharField(max_length=256)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
 
     def __str__(self):
         return self.tag_name

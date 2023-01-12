@@ -3,21 +3,11 @@
 
 <body>
 
-<!--  <h1>Panel</h1>-->
-<!--      {% block messages %}-->
-<!--          {% if messages %}-->
-<!--              {% for message in messages %}-->
-<!--                  <div class="alert alert-{{ message.tags }}">-->
-<!--                      <a class="close" data-dismiss="alert">×</a>-->
-<!--                      {{ message|safe }}-->
-<!--                  </div>-->
-<!--              {% endfor %}-->
-<!--          {% endif %}-->
-<!--      {% endblock %}-->
-<!--    </div>-->
+
 
   {% if user.is_authenticated %}
     <p>Jesteś zalogowany jako {{ user.username }}</p>
+
     <p><a href="{% url 'logout' %}">Logout</a></p>
     <p><a href="{% url 'upload' %}">Upload</a></p>
     <p><a href="{% url 'display' %}">Display</a></p>
