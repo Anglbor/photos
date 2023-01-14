@@ -32,39 +32,90 @@ class DisplayView(View):
 
 # uploads photos, adding tags to the photos
 class Photo_upload_view(View):
+    def fx(self, request, form, img_obj=None):
+        taglist = []
+        js_tags = json.dumps(taglist)
+        alltags = [tag.tag_name for tag in Tag.objects.filter(user=request.user.id)]
+        js_alltags = json.dumps(alltags)
+        ctx = {
+            'form': form,
+            'img_obj': img_obj,
+            'js_tags': js_tags,
+            "js_alltags": js_alltags
+           }
+        return render(request, "photo_upload.html", ctx)
+
     def get(self, request):
-        form = PhotoForm()
-        return render(request, "photo_upload.html", {'form': form})
+
+        # Taglist exists due to javascript in template, js expects in a taglist. For uploading a new photo
+        # taglist always will be empty (tags do not exist for a new photo yet).
+        # taglist = []
+        # js_tags = json.dumps(taglist)
+        # alltags = [tag.tag_name for tag in Tag.objects.filter(user=request.user.id)]
+        # js_alltags = json.dumps(alltags)
+
+        form = DisplayForm()
+        return self.fx(request, form)
+
+        # ctx = {
+        #     'form': form,
+        #     'js_tags': js_tags,
+        #     "js_alltags": js_alltags
+        # }
+        #
+        # return render(request, "photo_upload.html", ctx)
+
 
     def post(self, request):
-
         form = PhotoForm(request.POST, request.FILES)
 
         if form.is_valid():
-            context = {'form': form}
-
             img_obj = form.instance
-
             photo_value = form.cleaned_data['photo']
             name_value = form.cleaned_data['name']
-            tag_set = form.cleaned_data['tags']
             sender = request.user
 
             new_photo = Photo.objects.create(name=name_value, photo=photo_value, sender=sender)
 
             id_value = new_photo.pk
 
-            # tag_query_set = Tag.objects.filter(tag_name=tag_name)
-            for tag in tag_set:
+            # Future work should check if the tag fields exists in the request.
+            tag_name_list = request.POST['tags'].split(',')
+
+            for tag_name in tag_name_list:
+                try:
+                    # print(f"attempting to query for tag {tag_name}")
+                    tag = Tag.objects.get(user=request.user.id, tag_name=tag_name)
+                except Tag.DoesNotExist as e:
+                    print(f'tag {tag_name} not found')
+                    tag = Tag.objects.create(tag_name=tag_name, user=request.user)
+                    print(f'created tag {tag_name}')
+                # here 'tag' must exist
                 new_photo.tag.add(tag)
-            # new_photo.tag.save()
-
-
-            # form.save()
-            return render(request, "photo_upload.html", {'form': form, 'img_obj': img_obj})
+            new_photo.save()
+            return self.fx(request, form, img_obj)
+            # taglist = []
+            # js_tags = json.dumps(taglist)
+            # alltags = [tag.tag_name for tag in Tag.objects.filter(user=request.user.id)]
+            # js_alltags = json.dumps(alltags)
+            # ctx = {'form': form,
+            #        'img_obj': img_obj,
+            #        'js_tags': js_tags,
+            #        "js_alltags": js_alltags
+            #        }
+            # return render(request, "photo_upload.html", ctx)
         else:
             form = PhotoForm
-        return render(request, "photo_upload.html", {'form': form})
+        return self.fx(request, form)
+        # taglist = []
+        # js_tags = json.dumps(taglist)
+        # alltags = [tag.tag_name for tag in Tag.objects.filter(user=request.user.id)]
+        # js_alltags = json.dumps(alltags)
+        # ctx = {'form': form,
+        #        'js_tags': js_tags,
+        #        "js_alltags": js_alltags
+        #        }
+        # return render(request, "photo_upload.html", ctx)
 
 
 

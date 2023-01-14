@@ -1,12 +1,43 @@
 {% extends 'base2.html' %}
-
+{% load static %}
 {% block content %}
 
 <form method="post" enctype="multipart/form-data">
   {% csrf_token %}
    {{ form.as_p }}
-  <button type="submit">Upload</button>
+     <link href="{% static 'static/js/tagger.css' %}" rel="stylesheet">
+    <style>
+        .tagger + .tagger {
+        margin-top: 10px;
+        }
+    </style>
+
+    <input type="text" value="" name="tags" />
+
+    <button type="submit">Upload</button>
 </form>
+
+   <script src="{% static 'static/js/tagger.js' %}"></script>
+        <script>
+            var input = document.querySelector('[name="tags"]');
+
+            var tags = tagger(input, {
+                              allow_duplicates: false,
+                              allow_spaces: true,
+                              wrap: true,
+                              completion: {
+                                  list: {{js_alltags|safe}}
+                              }
+                        });
+
+
+
+            var taglist = {{js_tags|safe}};
+            for (i = 0; i < taglist.length; i++) {
+                console.log(taglist[i]);
+                tags.add_tag(taglist[i]);
+            };
+        </script>
 
 
 

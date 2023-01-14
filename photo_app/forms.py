@@ -5,7 +5,8 @@ from .models import TAGS, LOCATIONS
 
 
 class PhotoForm(forms.ModelForm):
-    tags = forms.ModelMultipleChoiceField(queryset=Tag.objects.all())
+    # this is not being in use due to js
+    #tags = forms.ModelMultipleChoiceField(queryset=Tag.objects.all())
 
     class Meta:
         model = Photo
