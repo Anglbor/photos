@@ -2,52 +2,30 @@
 {% load static %}
 
 {% block content %}
-        <h2>Photo:</h2>
-    <ul>
-       {{ photo }}
+<h2>Photo:</h2>
+<ul>
+    {{ photo }}
 
-        <img src="{{ photo.photo.url }}" width="500px"/>
+    <img src="{{ photo.photo.url }}" width="500px"/>
+    {% for tag in photo.tag.all %}
+    <li>{{tag.tag_name}}</li>
 
-
-        {% for tag in photo.tag.all %}
-        <li>{{tag.tag_name}}</li>
-
-        {% endfor %}
+    {% endfor %}
 </ul>
 
-    <link href="{% static 'static/js/tagger.css' %}" rel="stylesheet">
-    <style>
-        .tagger + .tagger {
-        margin-top: 10px;
-        }
-    </style>
-        <form action="" method="post">
-            {% csrf_token %}
-            <input type="text" value="" name="tags" />
-            <input type="submit" value="Submit">
-        </form>
+<link href="{% static 'static/js/tagger.css' %}" rel="stylesheet">
+<form action="" method="post">
+    {% csrf_token %}
+    <input type="text" value="" name="tags" />
+    <script src="{% static 'static/js/tagger.js' %}"></script>
+    <script>
+      var tags_input = document.querySelector('[name="tags"]');
+      var js_alltags = {{js_alltags|safe}};
+      var js_tags = {{js_tags|safe}};
+    </script>
+    <script src="{% static 'static/js/tags.js' %}"></script>
 
-
-        <script src="{% static 'static/js/tagger.js' %}"></script>
-        <script>
-            var input = document.querySelector('[name="tags"]');
-
-            var tags = tagger(input, {
-                              allow_duplicates: false,
-                              allow_spaces: true,
-                              wrap: true,
-                              completion: {
-                                  list: {{js_alltags|safe}}
-                              }
-                        });
-
-
-
-            var taglist = {{js_tags|safe}};
-            for (i = 0; i < taglist.length; i++) {
-                console.log(taglist[i]);
-                tags.add_tag(taglist[i]);
-            };
-        </script>
+    <input type="submit" value="Submit">
+</form>
 
 {% endblock %}

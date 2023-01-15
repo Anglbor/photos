@@ -1,18 +1,34 @@
 {% extends 'base2.html' %}
+{% load static %}
 
 {% block content %}
-    <form action="" method="post">
-        {% csrf_token %}
-        {{ form }}
-        <button type="submit">Search</button>
-    </form>
+<!--
+This link is needed to load the tagger style properly, and must be done before
+trying to load the tagger.js script.
+-->
+<link href="{% static 'static/js/tagger.css' %}" rel="stylesheet">
+
+<form action="" method="post">
+    {% csrf_token %}
+    {{ form }}
+    <!-- Change the search box into a tag selection field. -->
+    <script src="{% static 'static/js/tagger.js' %}"></script>
+    <script>
+      var tags_input = document.querySelector('[name="search"]');
+      var js_alltags = {{js_alltags|safe}};
+      var js_tags = {{js_tags|safe}};
+    </script>
+	<script src="{% static 'static/js/tags.js' %}"></script>
+
+    <button type="submit">Search</button>
+</form>
 
 
-     <h2>Photos:</h2>
-    <ul>
-        {% for photo in photos %}
-            <li><a href="/photo/{{photo.id}}"><img src="{{ photo.photo.url }}" width="500px"/></a></li>
-<!--            <a href="/photo/{{pic.id}}"><img src="{{ pic.photo.url }}" width="500px"/></a>-->
-        {% endfor %}
-    </ul>
+<h2>Photos:</h2>
+<ul>
+    {% for photo in photos %}
+    <li><a href="/photo/{{photo.id}}"><img src="{{ photo.photo.url }}" width="500px"/></a></li>
+    {% endfor %}
+</ul>
+
 {% endblock %}
