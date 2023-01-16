@@ -156,7 +156,7 @@ class PhotoView(View):
     def get(self, request, id):
         if not request.user.is_authenticated:
             return redirect("login")
-        
+
         try:
             photo = Photo.objects.get(pk=id)
         except Photo.DoesNotExist as e:
@@ -222,24 +222,31 @@ class PhotoView(View):
 class SearchView(View):
     def get(self, request):
         form = SearchForm()
-        context = {'form': form}
+        alltags = [tag.tag_name for tag in Tag.objects.filter(user=request.user.id)]
+
+        context = {
+            'form': form,
+            'js_tags': json.dumps([]),
+            'js_alltags': json.dumps(alltags)
+        }
 
         return render(request, "search.html", context)
 
     def post(self, request):
         form = SearchForm(request.POST)
         photos =""
-        contex = {
+        alltags = [tag.tag_name for tag in Tag.objects.filter(user=request.user.id)]
+        ctx = {
             "form": form,
-            "photos": photos
+            "photos": photos,
+            'js_tags': json.dumps([]),
+            'js_alltags': json.dumps(alltags)
         }
 
         if form.is_valid():  # True/ False
-
             search_value = form.cleaned_data['search']
             tags = Tag.objects.filter(tag_name__icontains=search_value)
             photos = Photo.objects.filter(tag__in=tags).filter(sender=request.user.id).distinct()
-            # contex["tags"] = tags
-            contex["photos"] = photos
+            ctx["photos"] = photos
 
-        return render(request, "search.html", contex)
+        return render(request, "search.html", ctx)
