@@ -234,7 +234,7 @@ class SearchView(View):
 
     def post(self, request):
         form = SearchForm(request.POST)
-        photos =""
+        photos = []
         alltags = [tag.tag_name for tag in Tag.objects.filter(user=request.user.id)]
         ctx = {
             "form": form,
@@ -244,9 +244,24 @@ class SearchView(View):
         }
 
         if form.is_valid():  # True/ False
-            search_value = form.cleaned_data['search']
-            tags = Tag.objects.filter(tag_name__icontains=search_value)
-            photos = Photo.objects.filter(tag__in=tags).filter(sender=request.user.id).distinct()
-            ctx["photos"] = photos
+            # list of strings put into the list - splited
+            search_tags_list = form.cleaned_data['search'].split(',')
+            # search_values = search for search in range(search_value)
+
+            # filted photos by user. Photos being used ony by the user.
+            photo_user = Photo.objects.filter(sender=request.user.id)
+
+            # loop of tag_name in the list
+            for tag_name in search_tags_list:
+                # comepered this some tags from loop and taken from Tag
+                tag_in_loop = Tag.objects.filter(tag_name=tag_name)
+                # filter search in photo_user by this same tag_name
+                photo_user = photo_user.filter(tag__in=tag_in_loop)
+
+
+            # tags = Tag.objects.filter(tag_name__icontains=search_value)
+
+            # photos = Photo.objects.filter(tag__in=tags).filter(sender=request.user.id).distinct()
+            ctx["photos"] = photo_user
 
         return render(request, "search.html", ctx)
