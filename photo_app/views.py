@@ -9,6 +9,13 @@ from django.shortcuts import render, redirect
 from .forms import PhotoForm, DisplayForm, SearchForm
 from django.contrib import messages
 
+
+def delete_view(request, id):
+    photo = Photo.objects.get(pk=id)
+    photo.tag.clear()
+    photo.delete()
+    return redirect('display')
+
 # shows display photos, which are ordered by id of the user
 
 class DisplayView(View):

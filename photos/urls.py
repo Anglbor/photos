@@ -17,7 +17,7 @@ Including another URLconf
 
 from django.contrib import admin
 from django.urls import path
-from photo_app.views import DisplayView, Photo_upload_view, LoginView, LogoutView, PhotoView, SearchView
+from photo_app.views import DisplayView, Photo_upload_view, LoginView, LogoutView, PhotoView, SearchView, delete_view
 from django.conf import settings
 from django.conf.urls.static import static
 
@@ -30,8 +30,9 @@ urlpatterns = [
     path('login/', LoginView.as_view(), name='login'),
     path('logout/', LogoutView.as_view(), name='logout'),
     path('photo/<int:id>/', PhotoView.as_view(), name='photo'),
-    path('search/', SearchView.as_view(), name='search')
+    path('search/', SearchView.as_view(), name='search'),
     # path('logout', LogoutView.as_view())
+    path('delete/<int:id>/', delete_view, name='delete')
 ]
 
 
