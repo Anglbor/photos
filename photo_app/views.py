@@ -1,3 +1,4 @@
+import os
 from pyexpat.errors import messages
 
 import json
@@ -11,12 +12,37 @@ from django.contrib import messages
 
 
 def delete_view(request, id):
+
+    # deleting the photo from database und photos list
     photo = Photo.objects.get(pk=id)
+    photo_tags = photo.tag.all()
+    if len(photo.photo)>0:
+        os.remove(photo.photo.path)
     photo.tag.clear()
     photo.delete()
+    messages.success(request, "Photo deleted")
+
+
+    photo_all = Photo.objects.all()
+
+    for tag in photo_tags:
+
+        # filter search in photo_user by this same tag_name
+        tags_in_photos = photo_all.filter(tag__in=tag)
+
+        if tags_in_photos.count() == 0:
+            tag.delete()
+
     return redirect('display')
 
-# shows display photos, which are ordered by id of the user
+
+
+
+
+
+
+
+#shows display photos, which are ordered by id of the user
 
 class DisplayView(View):
     def get(self, request):
