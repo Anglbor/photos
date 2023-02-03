@@ -16,6 +16,12 @@ def delete_view(request, id):
     # deleting the photo from database und photos list
     photo = Photo.objects.get(pk=id)
     photo_tags = photo.tag.all()
+    for tag in photo_tags:
+        # This loop forces the photo_tags queryset to evaluate, because we'll
+        # be needing it in a moment to check for tags that aren't used in any
+        # photo.
+        pass
+
     if len(photo.photo)>0:
         os.remove(photo.photo.path)
     photo.tag.clear()
@@ -26,9 +32,8 @@ def delete_view(request, id):
     photo_all = Photo.objects.all()
 
     for tag in photo_tags:
-
-        # filter search in photo_user by this same tag_name
-        tags_in_photos = photo_all.filter(tag__in=tag)
+        # filter search in photo_all by this same tag
+        tags_in_photos = photo_all.filter(tag__in=[tag])
 
         if tags_in_photos.count() == 0:
             tag.delete()
