@@ -9,36 +9,35 @@ from photo_app.models import Photo, Tag, Display_photos
 from django.shortcuts import render, redirect
 from .forms import PhotoForm, DisplayForm, SearchForm
 from django.contrib import messages
+from django.http import Http404
+
 
 
 def delete_view(request, id):
 
     # deleting the photo from database und photos list
-    photo = Photo.objects.get(pk=id)
-    photo_tags = photo.tag.all()
-    for tag in photo_tags:
-        # This loop forces the photo_tags queryset to evaluate, because we'll
-        # be needing it in a moment to check for tags that aren't used in any
-        # photo.
-        pass
+    try:
+        photo = Photo.objects.get(pk=id, sender=request.user.id)
 
-    if len(photo.photo)>0:
-        os.remove(photo.photo.path)
-    photo.tag.clear()
-    photo.delete()
-    messages.success(request, "Photo deleted")
+        photo_tags = photo.tag.all()
+        for tag in photo_tags:
+            # This loop forces the photo_tags queryset to evaluate, because we'll
+            # be needing it in a moment to check for tags that aren't used in any
+            # photo.
+            pass
 
+        if len(photo.photo)>0:
+            os.remove(photo.photo.path)
+        photo.tag.clear()
 
-    photo_all = Photo.objects.all()
+        messages.success(request, "Photo deleted")
 
-    for tag in photo_tags:
-        # filter search in photo_all by this same tag
-        tags_in_photos = photo_all.filter(tag__in=[tag])
+        delete_unused_tags(photo_tags)
 
-        if tags_in_photos.count() == 0:
-            tag.delete()
+        return redirect('display')
 
-    return redirect('display')
+    except Photo.DoesNotExist:
+        raise Http404("No Photo model matches a query")
 
 
 
@@ -236,8 +235,17 @@ class PhotoView(View):
         tag_name_list = request.POST['tags'].split(',')
 
         photo = Photo.objects.get(pk=id)
+
+        old_photo_tags = photo.tag.all()
+        for tag in old_photo_tags:
+            # This loop forces the photo_tags queryset to evaluate, because we'll
+            # be needing it in a moment to check for tags that aren't used in any
+            # photo.
+            pass
+
         photo.tag.clear()
 
+        # adding tag to the photo
         for tag_name in tag_name_list:
             try:
                 # print(f"attempting to query for tag {tag_name}")
@@ -250,6 +258,9 @@ class PhotoView(View):
             photo.tag.add(tag)
         photo.save()
         # print(tag_name_list)
+
+        delete_unused_tags(old_photo_tags)
+
         return self.get(request, id)
 
 
@@ -291,7 +302,7 @@ class SearchView(View):
 
             # loop of tag_name in the list
             for tag_name in search_tags_list:
-                # comepered this some tags from loop and taken from Tag
+                # compered this some tags from loop and taken from Tag
                 tag_in_loop = Tag.objects.filter(tag_name=tag_name)
                 # filter search in photo_user by this same tag_name
                 photo_user = photo_user.filter(tag__in=tag_in_loop)
@@ -303,3 +314,18 @@ class SearchView(View):
             ctx["photos"] = photo_user
 
         return render(request, "search.html", ctx)
+
+
+
+def delete_unused_tags(tag_set):
+    photo_all = Photo.objects.all()
+    for tag in tag_set:
+        # filter search in photo_all by this same tag
+        tags_in_photos = photo_all.filter(tag__in=[tag])
+
+        if tags_in_photos.count() == 0:
+            tag.delete()
+
+
+
+
