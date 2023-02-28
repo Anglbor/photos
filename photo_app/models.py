@@ -1,3 +1,6 @@
+from datetime import datetime
+
+import django.utils
 from django.db import models
 from django.db.models import DateTimeField
 from django.contrib.auth.models import User
@@ -37,7 +40,7 @@ class Photo(models.Model):
     sender = models.ForeignKey(User, on_delete=models.CASCADE)
     # date_sent = models.DateTimeField(auto_now_add=True)
     # take_by = models.CharField(max_length=256)
-    # take_date = DateTimeField(null=True)
+    taken_date = DateTimeField(null=True, default=django.utils.timezone.now)
     tag = models.ManyToManyField(Tag)
 
     def __str__(self):

@@ -220,8 +220,12 @@ class PhotoView(View):
         alltags = [tag.tag_name for tag in Tag.objects.filter(user=request.user.id)]
         js_alltags = json.dumps(alltags)
 
+
+        taken_date = photo.taken_date
+
         form = DisplayForm()
         ctx = {
+            'taken_date': taken_date,
             'photo': photo,
             'js_tags': js_tags,
             "js_alltags": js_alltags
