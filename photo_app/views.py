@@ -1,4 +1,5 @@
 import os
+from datetime import datetime
 from pyexpat.errors import messages
 
 import json
@@ -91,7 +92,7 @@ class Photo_upload_view(View):
         # alltags = [tag.tag_name for tag in Tag.objects.filter(user=request.user.id)]
         # js_alltags = json.dumps(alltags)
 
-        form = DisplayForm()
+        form = PhotoForm()
         return self.fx(request, form)
 
         # ctx = {
@@ -106,13 +107,15 @@ class Photo_upload_view(View):
     def post(self, request):
         form = PhotoForm(request.POST, request.FILES)
 
+
         if form.is_valid():
             img_obj = form.instance
             photo_value = form.cleaned_data['photo']
             name_value = form.cleaned_data['name']
             sender = request.user
+            date_taken_value = form.cleaned_data['taken_date']
 
-            new_photo = Photo.objects.create(name=name_value, photo=photo_value, sender=sender)
+            new_photo = Photo.objects.create(name=name_value, photo=photo_value, taken_date=date_taken_value, sender=sender)
 
             id_value = new_photo.pk
 
@@ -240,6 +243,11 @@ class PhotoView(View):
 
         photo = Photo.objects.get(pk=id)
 
+        # date of the photo being saved in the database
+
+        date_taken = datetime.fromisoformat(request.POST['taken-date'])
+        photo.taken_date = date_taken
+
         old_photo_tags = photo.tag.all()
         for tag in old_photo_tags:
             # This loop forces the photo_tags queryset to evaluate, because we'll
@@ -264,6 +272,8 @@ class PhotoView(View):
         # print(tag_name_list)
 
         delete_unused_tags(old_photo_tags)
+
+
 
         return self.get(request, id)
 
@@ -297,7 +307,7 @@ class SearchView(View):
         }
 
         if form.is_valid():  # True/ False
-            # list of strings put into the list - splited
+            # list of strings put into the list - split
             search_tags_list = form.cleaned_data['search'].split(',')
             # search_values = search for search in range(search_value)
 

@@ -12,15 +12,13 @@
 
     {% endfor %}
 
-    <label for="taken-date">Photo taken date:</label>
 
-<input type="datetime-local" id="taken-date"
-       name="taken-date" value="{{taken_date|date:'Y-m-d'}}T{{taken_date|time:'H:i'}}">
 </ul>
 
 <link href="{% static 'static/js/tagger.css' %}" rel="stylesheet">
 <form action="" method="post">
     {% csrf_token %}
+
     <input type="text" value="" name="tags" />
     <script src="{% static 'static/js/tagger.js' %}"></script>
     <script>
@@ -29,6 +27,11 @@
       var js_tags = {{js_tags|safe}};
     </script>
     <script src="{% static 'static/js/tags.js' %}"></script>
+
+    <label for="taken-date">Photo taken date:</label>
+
+    <input type="datetime-local" id="taken-date"
+       name="taken-date" value="{{taken_date|date:'Y-m-d'}}T{{taken_date|time:'H:i'}}">
 
     <input type="submit" value="Submit">
 </form>

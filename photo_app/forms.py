@@ -7,6 +7,7 @@ from .models import TAGS, LOCATIONS
 class PhotoForm(forms.ModelForm):
     # this is not being in use due to js
     #tags = forms.ModelMultipleChoiceField(queryset=Tag.objects.all())
+    taken_date = forms.DateTimeField()
 
     class Meta:
         model = Photo
