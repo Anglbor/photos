@@ -4,14 +4,17 @@ from .models import Photo, Tag
 from .models import TAGS, LOCATIONS
 
 
+class DateTimeSelector(forms.widgets.DateTimeInput):
+    input_type = 'datetime-local'
+
 class PhotoForm(forms.ModelForm):
     # this is not being in use due to js
     #tags = forms.ModelMultipleChoiceField(queryset=Tag.objects.all())
-    taken_date = forms.DateTimeField()
 
     class Meta:
         model = Photo
-        fields = ('name', 'photo')
+        fields = ('name', 'photo', 'taken_date')
+        widgets = {'taken_date': DateTimeSelector}
 
 
 class DisplayForm(forms.ModelForm):
@@ -26,4 +29,3 @@ class SearchForm(forms.Form):
 
 class TagForm(forms.Form):
     tags = forms.CharField(label='tags')
-
