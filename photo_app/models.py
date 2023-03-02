@@ -51,7 +51,7 @@ class Photo(models.Model):
 
 
 class Album(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     album_name = models.CharField(max_length=256)
     # album = models.ManyToManyField(Photo)
 

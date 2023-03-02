@@ -1,0 +1,27 @@
+{% extends 'base2.html' %}
+{% load static %}
+
+{% block content %}
+<h2>Albums:</h2>
+<ul>
+{% for album in album_list %}
+
+{% endfor %}
+
+</ul>
+
+<form action="" method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+
+
+
+
+
+
+    <input type="submit" value="Submit">
+</form>
+
+
+
+{% endblock %}

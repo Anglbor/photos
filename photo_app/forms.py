@@ -1,6 +1,6 @@
 from django import forms
 
-from .models import Photo, Tag
+from .models import Photo, Tag, Album
 from .models import TAGS, LOCATIONS
 
 
@@ -29,3 +29,7 @@ class SearchForm(forms.Form):
 
 class TagForm(forms.Form):
     tags = forms.CharField(label='tags')
+
+
+class AlbumForm(forms.Form):
+    album_name = forms.CharField(label='album_name')

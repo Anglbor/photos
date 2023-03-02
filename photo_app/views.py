@@ -6,12 +6,38 @@ import json
 
 from django.contrib.auth import authenticate, login, logout
 from django.views import View
-from photo_app.models import Photo, Tag, Display_photos
+from photo_app.models import Photo, Tag, Display_photos, Album
 from django.shortcuts import render, redirect
-from .forms import PhotoForm, DisplayForm, SearchForm
+from .forms import PhotoForm, DisplayForm, SearchForm, AlbumForm
 from django.contrib import messages
 from django.http import Http404
 
+
+
+class Album_creatView(View):
+    def get(self, request):
+        album_list = Album.objects.filter(user=request.user.id).order_by('album_name')
+        form = AlbumForm()
+        ctx = {'album_list': album_list,
+               'form': form}
+
+        return render(request, 'albums.html', ctx)
+
+    def post(self, request):
+        form = AlbumForm(request.POST)
+        ctx = {'form': form}
+
+        if form.is_valid():
+
+            album_name_value = form.cleaned_data['album_name']
+            user = request.user
+
+
+            new_album = Album.objects.create(album_name=album_name_value, user=user)
+
+            id_value = new_album.pk
+
+        return render(request, 'albums.html', ctx)
 
 
 def delete_view(request, id):
