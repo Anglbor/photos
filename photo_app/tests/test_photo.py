@@ -6,8 +6,8 @@ from photo_app.models import Photo, Tag
 class PhotoTests(TestCase):
 
     def setUp(self):
-        self.tag = Tag.objects.create(tag_name="Door")
         self.user = User.objects.create_user(username="tester", password="54321")
+        self.tag = Tag.objects.create(tag_name="Door", user=self.user)
         pass
 
     def test_photo_default(self):
