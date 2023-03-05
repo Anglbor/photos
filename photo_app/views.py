@@ -14,6 +14,10 @@ from django.http import Http404
 
 
 
+def add_photo_album():
+
+
+
 class Album_creatView(View):
     def get(self, request):
         album_list = Album.objects.filter(user=request.user.id).order_by('album_name')
@@ -111,15 +115,15 @@ class Photo_upload_view(View):
 
     def get(self, request):
 
-        # Taglist exists due to javascript in template, js expects in a taglist. For uploading a new photo
-        # taglist always will be empty (tags do not exist for a new photo yet).
-        # taglist = []
         # js_tags = json.dumps(taglist)
         # alltags = [tag.tag_name for tag in Tag.objects.filter(user=request.user.id)]
         # js_alltags = json.dumps(alltags)
-
+        album_list = Album.objects.filter(user=request.user.id).order_by('album_name')
+        formx = AlbumForm()
+        ctx = {'album_list': album_list,
+                'formx': formx}
         form = PhotoForm()
-        return self.fx(request, form)
+        return self.fx(request, form, formx, ctx)
 
         # ctx = {
         #     'form': form,
@@ -133,6 +137,16 @@ class Photo_upload_view(View):
     def post(self, request):
         form = PhotoForm(request.POST, request.FILES)
 
+        formx = AlbumForm(request.POST)
+        ctx = {'formx': formx}
+
+        if formx.is_valid():
+            album_name_value = form.cleaned_data['album_name']
+            user = request.user
+
+            new_album = Album.objects.create(album_name=album_name_value, user=user)
+
+            id_value = new_album.pk
 
         if form.is_valid():
             img_obj = form.instance
@@ -140,6 +154,7 @@ class Photo_upload_view(View):
             name_value = form.cleaned_data['name']
             sender = request.user
             date_taken_value = form.cleaned_data['taken_date']
+
 
             new_photo = Photo.objects.create(name=name_value, photo=photo_value, taken_date=date_taken_value, sender=sender)
 
@@ -172,7 +187,7 @@ class Photo_upload_view(View):
             # return render(request, "photo_upload.html", ctx)
         else:
             form = PhotoForm
-        return self.fx(request, form)
+        return self.fx(request, form, ctx)
         # taglist = []
         # js_tags = json.dumps(taglist)
         # alltags = [tag.tag_name for tag in Tag.objects.filter(user=request.user.id)]

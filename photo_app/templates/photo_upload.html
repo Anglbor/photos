@@ -4,7 +4,11 @@
 
 <form method="post" enctype="multipart/form-data">
   {% csrf_token %}
+
+  {{ formx.as_p }}
+
   {{ form.as_p }}
+
     <link href="{% static 'static/js/tagger.css' %}" rel="stylesheet">
 
     <input type="text" value="" name="tags" />
