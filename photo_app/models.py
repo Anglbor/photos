@@ -33,9 +33,17 @@ class Tag(models.Model):
         return self.tag_name
 
 
+class Album(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    album_name = models.CharField(max_length=256)
+
+    def __str__(self):
+        return self.album_name
+
 
 class Photo(models.Model):
     name = models.CharField(max_length=256, default="blank")
+    album = models.ForeignKey(Album, on_delete=models.CASCADE, null=True)
     photo = models.ImageField(upload_to='photos')
     sender = models.ForeignKey(User, on_delete=models.CASCADE)
     # date_sent = models.DateTimeField(auto_now_add=True)
@@ -43,17 +51,12 @@ class Photo(models.Model):
     taken_date = DateTimeField(null=True, default=django.utils.timezone.now)
     tag = models.ManyToManyField(Tag)
 
+
     def __str__(self):
         return self.name
 
 
 
-
-
-class Album(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    album_name = models.CharField(max_length=256)
-    # album = models.ManyToManyField(Photo)
 
 # class Location(models.Model):
 #     location_name = models.CharField(max_length=256, choices=LOCATIONS)

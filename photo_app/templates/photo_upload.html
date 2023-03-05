@@ -5,7 +5,16 @@
 <form method="post" enctype="multipart/form-data">
   {% csrf_token %}
 
-  {{ formx.as_p }}
+  <label for="album_list">Choose an album:</label>
+
+  <select name="album_name" id="album_list">
+    <option value="None">None </option>
+    {% for album in album_list %}
+    <option value="{{album.album_name}}">{{album.album_name}} </option>
+    {% endfor %}
+  </select>
+
+
 
   {{ form.as_p }}
 

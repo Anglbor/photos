@@ -14,7 +14,7 @@ from django.http import Http404
 
 
 
-def add_photo_album():
+# def add_photo_album():
 
 
 
@@ -105,11 +105,13 @@ class Photo_upload_view(View):
         js_tags = json.dumps(taglist)
         alltags = [tag.tag_name for tag in Tag.objects.filter(user=request.user.id)]
         js_alltags = json.dumps(alltags)
+        album_list = Album.objects.filter(user=request.user.id).order_by('album_name')
         ctx = {
             'form': form,
             'img_obj': img_obj,
             'js_tags': js_tags,
-            "js_alltags": js_alltags
+            "js_alltags": js_alltags,
+            "album_list": album_list
            }
         return render(request, "photo_upload.html", ctx)
 
@@ -118,12 +120,9 @@ class Photo_upload_view(View):
         # js_tags = json.dumps(taglist)
         # alltags = [tag.tag_name for tag in Tag.objects.filter(user=request.user.id)]
         # js_alltags = json.dumps(alltags)
-        album_list = Album.objects.filter(user=request.user.id).order_by('album_name')
-        formx = AlbumForm()
-        ctx = {'album_list': album_list,
-                'formx': formx}
+
         form = PhotoForm()
-        return self.fx(request, form, formx, ctx)
+        return self.fx(request, form)
 
         # ctx = {
         #     'form': form,
@@ -138,15 +137,6 @@ class Photo_upload_view(View):
         form = PhotoForm(request.POST, request.FILES)
 
         formx = AlbumForm(request.POST)
-        ctx = {'formx': formx}
-
-        if formx.is_valid():
-            album_name_value = form.cleaned_data['album_name']
-            user = request.user
-
-            new_album = Album.objects.create(album_name=album_name_value, user=user)
-
-            id_value = new_album.pk
 
         if form.is_valid():
             img_obj = form.instance
@@ -173,6 +163,15 @@ class Photo_upload_view(View):
                     print(f'created tag {tag_name}')
                 # here 'tag' must exist
                 new_photo.tag.add(tag)
+
+
+            if formx.is_valid():
+                album_name_value = formx.cleaned_data['album_name']
+                try:
+                    album = Album.objects.get(user=request.user.id, album_name=album_name_value)
+                    new_photo.album = album
+                except Album.DoesNotExist as e:
+                    print(f"Album not found and won't be found")
             new_photo.save()
             return self.fx(request, form, img_obj)
             # taglist = []
@@ -187,7 +186,7 @@ class Photo_upload_view(View):
             # return render(request, "photo_upload.html", ctx)
         else:
             form = PhotoForm
-        return self.fx(request, form, ctx)
+        return self.fx(request, form)
         # taglist = []
         # js_tags = json.dumps(taglist)
         # alltags = [tag.tag_name for tag in Tag.objects.filter(user=request.user.id)]
