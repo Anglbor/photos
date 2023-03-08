@@ -1,0 +1,17 @@
+{% extends 'base2.html' %}
+{% load static %}
+
+{% block content %}
+<h2>Albums:</h2>
+<ul>
+{% for album in albums_list %}
+    <li> {{album.album_name}} </li>
+    <a href="/album/{{album.id}}">link</a>
+
+{% endfor %}
+
+</ul>
+
+
+{% endblock %}
+

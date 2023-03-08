@@ -14,7 +14,20 @@ from django.http import Http404
 
 
 
-# def add_photo_album():
+
+class AlbumsListView(View):
+    def get(self, request):
+        albums_list = Album.objects.filter(user=request.user.id).order_by('album_name')
+        ctx = {'albums_list': albums_list}
+        return render(request, 'albums_list.html', ctx)
+
+
+class AlbumView(View):
+    def get(self, request, id):
+        photos_album_list = Photo.objects.filter(sender=request.user.id).filter(album=album_id)
+        ctx = {'photos_album_list': photos_album_list}
+        return render(request, 'album.html', ctx)
+
 
 
 
@@ -266,8 +279,11 @@ class PhotoView(View):
 
         taken_date = photo.taken_date
 
+        album_list = Album.objects.filter(user=request.user.id).order_by('album_name')
         form = DisplayForm()
         ctx = {
+
+            'album_list': album_list,
             'taken_date': taken_date,
             'photo': photo,
             'js_tags': js_tags,
@@ -297,6 +313,8 @@ class PhotoView(View):
 
         photo.tag.clear()
 
+
+
         # adding tag to the photo
         for tag_name in tag_name_list:
             try:
@@ -308,6 +326,18 @@ class PhotoView(View):
                 print(f'created tag {tag_name}')
             # here 'tag' must exist
             photo.tag.add(tag)
+
+        formx = AlbumForm(request.POST)
+
+        # album being change with the photo
+        if formx.is_valid():
+            album_name_value = formx.cleaned_data['album_name']
+            try:
+                album = Album.objects.get(user=request.user.id, album_name=album_name_value)
+                photo.album = album
+            except Album.DoesNotExist as e:
+                print(f"Album not found and won't be found")
+
         photo.save()
         # print(tag_name_list)
 

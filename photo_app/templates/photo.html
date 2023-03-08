@@ -2,6 +2,12 @@
 {% load static %}
 
 {% block content %}
+
+<a>Album name:</a>
+<label>{{photo.album.album_name}}</label>
+
+<br>
+
 <h2>Photo:</h2>
 <ul>
     {{ photo }}
@@ -13,11 +19,18 @@
     {% endfor %}
 
 
-</ul>
 
 <link href="{% static 'static/js/tagger.css' %}" rel="stylesheet">
 <form action="" method="post">
     {% csrf_token %}
+    <label for="album_list">Change an album:</label>
+
+  <select name="album_name" id="album_list">
+    <option value="None">None </option>
+    {% for album in album_list %}
+    <option value="{{album.album_name}}">{{album.album_name}} </option>
+    {% endfor %}
+  </select>
 
     <input type="text" value="" name="tags" />
     <script src="{% static 'static/js/tagger.js' %}"></script>
