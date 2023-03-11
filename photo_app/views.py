@@ -1,9 +1,7 @@
 import os
 from datetime import datetime
 from pyexpat.errors import messages
-
 import json
-
 from django.contrib.auth import authenticate, login, logout
 from django.views import View
 from photo_app.models import Photo, Tag, Display_photos, Album
@@ -11,8 +9,6 @@ from django.shortcuts import render, redirect
 from .forms import PhotoForm, DisplayForm, SearchForm, AlbumForm
 from django.contrib import messages
 from django.http import Http404
-
-
 
 
 class AlbumsListView(View):
@@ -24,11 +20,9 @@ class AlbumsListView(View):
 
 class AlbumView(View):
     def get(self, request, id):
-        photos_album_list = Photo.objects.filter(sender=request.user.id).filter(album=album_id)
+        photos_album_list = Photo.objects.filter(sender=request.user.id).filter(album=id)
         ctx = {'photos_album_list': photos_album_list}
         return render(request, 'album.html', ctx)
-
-
 
 
 class Album_creatView(View):
@@ -37,28 +31,22 @@ class Album_creatView(View):
         form = AlbumForm()
         ctx = {'album_list': album_list,
                'form': form}
-
         return render(request, 'albums.html', ctx)
 
     def post(self, request):
         form = AlbumForm(request.POST)
         ctx = {'form': form}
-
         if form.is_valid():
-
             album_name_value = form.cleaned_data['album_name']
             user = request.user
-
 
             new_album = Album.objects.create(album_name=album_name_value, user=user)
 
             id_value = new_album.pk
-
         return render(request, 'albums.html', ctx)
 
 
 def delete_view(request, id):
-
     # deleting the photo from database und photos list
     try:
         photo = Photo.objects.get(pk=id, sender=request.user.id)
@@ -70,7 +58,7 @@ def delete_view(request, id):
             # photo.
             pass
 
-        if len(photo.photo)>0:
+        if len(photo.photo) > 0:
             os.remove(photo.photo.path)
         photo.tag.clear()
 
@@ -84,14 +72,7 @@ def delete_view(request, id):
         raise Http404("No Photo model matches a query")
 
 
-
-
-
-
-
-
-#shows display photos, which are ordered by id of the user
-
+# shows display photos, which are ordered by id of the user
 class DisplayView(View):
     def get(self, request):
         photo_list = Photo.objects.filter(sender=request.user.id).order_by('name')
@@ -145,7 +126,6 @@ class Photo_upload_view(View):
         #
         # return render(request, "photo_upload.html", ctx)
 
-
     def post(self, request):
         form = PhotoForm(request.POST, request.FILES)
 
@@ -157,7 +137,6 @@ class Photo_upload_view(View):
             name_value = form.cleaned_data['name']
             sender = request.user
             date_taken_value = form.cleaned_data['taken_date']
-
 
             new_photo = Photo.objects.create(name=name_value, photo=photo_value, taken_date=date_taken_value, sender=sender)
 
@@ -176,7 +155,6 @@ class Photo_upload_view(View):
                     print(f'created tag {tag_name}')
                 # here 'tag' must exist
                 new_photo.tag.add(tag)
-
 
             if formx.is_valid():
                 album_name_value = formx.cleaned_data['album_name']
@@ -209,10 +187,6 @@ class Photo_upload_view(View):
         #        "js_alltags": js_alltags
         #        }
         # return render(request, "photo_upload.html", ctx)
-
-
-
-
 
 
 # shows login for user, displays 3 different photos
@@ -276,7 +250,6 @@ class PhotoView(View):
         alltags = [tag.tag_name for tag in Tag.objects.filter(user=request.user.id)]
         js_alltags = json.dumps(alltags)
 
-
         taken_date = photo.taken_date
 
         album_list = Album.objects.filter(user=request.user.id).order_by('album_name')
@@ -313,8 +286,6 @@ class PhotoView(View):
 
         photo.tag.clear()
 
-
-
         # adding tag to the photo
         for tag_name in tag_name_list:
             try:
@@ -343,14 +314,10 @@ class PhotoView(View):
 
         delete_unused_tags(old_photo_tags)
 
-
-
         return self.get(request, id)
 
-
-
-
 # searching photos base on tags, and login user
+
 
 class SearchView(View):
     def get(self, request):
@@ -380,7 +347,6 @@ class SearchView(View):
             # list of strings put into the list - split
             search_tags_list = form.cleaned_data['search'].split(',')
             # search_values = search for search in range(search_value)
-
             # filted photos by user. Photos being used ony by the user.
             photo_user = Photo.objects.filter(sender=request.user.id)
 
@@ -391,14 +357,11 @@ class SearchView(View):
                 # filter search in photo_user by this same tag_name
                 photo_user = photo_user.filter(tag__in=tag_in_loop)
 
-
             # tags = Tag.objects.filter(tag_name__icontains=search_value)
-
             # photos = Photo.objects.filter(tag__in=tags).filter(sender=request.user.id).distinct()
             ctx["photos"] = photo_user
 
         return render(request, "search.html", ctx)
-
 
 
 def delete_unused_tags(tag_set):
@@ -409,7 +372,3 @@ def delete_unused_tags(tag_set):
 
         if tags_in_photos.count() == 0:
             tag.delete()
-
-
-
-
